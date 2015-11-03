@@ -1,5 +1,6 @@
 package eagleapp.com.holidaynotify;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -8,8 +9,19 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+import com.android.volley.RequestQueue;
+
+import eagleapp.com.holidaynotify.httprequest.HttpRequest;
+import eagleapp.com.holidaynotify.httprequest.HttpResultListener;
+
+public class MainActivity extends AppCompatActivity implements HttpResultListener {
+
+    private TextView responseTW;
+    private HttpRequest request;
+    private final String requestTag = "dayRequests";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +38,22 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        responseTW = (TextView) findViewById(R.id.responseTW);
+        responseTW.setText("changed");
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        new HttpRequest(this).sendRequest(requestTag);
+    }
+
+    protected void onStop(){
+        super.onStop();
+        if( request.getQueue() != null ){
+            request.getQueue().cancelAll(requestTag);
+        }
     }
 
     @Override
@@ -48,5 +76,20 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onResponse(String result) {
+        responseTW.setText(result);
+    }
+
+    @Override
+    public void onErrorResult(String result) {
+        onResponse(result);
+    }
+
+    @Override
+    public Context getContext() {
+        return this;
     }
 }
