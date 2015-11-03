@@ -6,6 +6,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,9 +16,11 @@ import com.android.volley.RequestQueue;
 
 import eagleapp.com.holidaynotify.httprequest.HttpRequest;
 import eagleapp.com.holidaynotify.httprequest.HttpResultListener;
+import eagleapp.com.holidaynotify.httprequest.enrico.Action;
 
 public class MainActivity extends AppCompatActivity implements HttpResultListener {
 
+    public static final String TAG = MainActivity.class.getName();
     private TextView responseTW;
     private HttpRequest request;
     private final String requestTag = "dayRequests";
@@ -40,20 +43,22 @@ public class MainActivity extends AppCompatActivity implements HttpResultListene
         });
 
         responseTW = (TextView) findViewById(R.id.responseTW);
-        responseTW.setText("changed");
+        responseTW.setText(Action.monthHolidays.toString());
     }
 
     @Override
     protected void onResume(){
         super.onResume();
-        new HttpRequest(this).sendRequest(requestTag);
+        this.request = new HttpRequest(this);
+        this.request.sendJsonRequest(requestTag);
     }
 
     protected void onStop(){
-        super.onStop();
         if( request.getQueue() != null ){
+            Log.d(TAG, "onstop method");
             request.getQueue().cancelAll(requestTag);
         }
+        super.onStop();
     }
 
     @Override
