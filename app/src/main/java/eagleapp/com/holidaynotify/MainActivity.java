@@ -12,11 +12,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import com.android.volley.RequestQueue;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import eagleapp.com.holidaynotify.httprequest.HttpRequest;
 import eagleapp.com.holidaynotify.httprequest.HttpResultListener;
-import eagleapp.com.holidaynotify.httprequest.enrico.Action;
+import eagleapp.com.holidaynotify.httprequest.enrico.EnricoParams;
 
 public class MainActivity extends AppCompatActivity implements HttpResultListener {
 
@@ -43,13 +44,20 @@ public class MainActivity extends AppCompatActivity implements HttpResultListene
         });
 
         responseTW = (TextView) findViewById(R.id.responseTW);
-        responseTW.setText(Action.monthHolidays.toString());
     }
 
     @Override
     protected void onResume(){
         super.onResume();
-        this.request = new HttpRequest(this);
+        LinkedHashMap<String, String> params = EnricoParams.buildParamsMap(
+                EnricoParams.Actions.KEY,
+                EnricoParams.Actions.Values.MONTH_HOLIDAYS,
+                EnricoParams.Keys.MONTH, "5",
+                EnricoParams.Keys.YEAR, "2016",
+                EnricoParams.Keys.COUNTRY, "fin",
+                EnricoParams.Keys.REGION, "Helsinki"
+        );
+        this.request = new HttpRequest(this, params);
         this.request.sendJsonRequest(requestTag);
     }
 

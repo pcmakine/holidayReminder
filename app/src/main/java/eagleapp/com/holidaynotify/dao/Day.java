@@ -38,8 +38,10 @@ public class Day {
 
     @Override
     public String toString(){
+        String ret = "";
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         String dateStr = df.format(date);
-        return dateStr;
+        ret = dateStr + ": " + englishName + " (" + localName + ")" ;
+        return ret;
     }
 }

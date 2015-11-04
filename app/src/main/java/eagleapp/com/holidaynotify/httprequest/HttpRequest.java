@@ -7,36 +7,37 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import eagleapp.com.holidaynotify.dao.Day;
-import eagleapp.com.holidaynotify.httprequest.enrico.Action;
+import eagleapp.com.holidaynotify.httprequest.enrico.EnricoParams;
 import eagleapp.com.holidaynotify.httprequest.enrico.JsonParser;
 
 /**
  * Created by Pete on 3.11.2015.
  */
 public class HttpRequest {
-    public static final String BASE_URL = "http://www.kayaposoft.com/enrico/json/v1.0/?";
-    public static final String URL = "http://httpbin.org/html";
     public static final String TAG = HttpRequest.class.getName();
+
+    public static final String BASE_URL = "http://www.kayaposoft.com/enrico/json/v1.0/?";
     private WeakReference<HttpResultListener> resultListener;
     private RequestQueue queue;
+    private LinkedHashMap<String, String> parameters;
 
-    public HttpRequest(HttpResultListener resultListener){
+
+    public HttpRequest(HttpResultListener resultListener, LinkedHashMap<String, String> parameters){
         this.resultListener = new WeakReference(resultListener);
+        this.parameters = parameters;
     }
 
     public void sendJsonRequest(String tag){
-        String url = BASE_URL + "action=getPublicHolidaysForMonth&month=5&year=2013&country=fin&region=Helsinki";
+        String url = BASE_URL + EnricoParams.buildParamsString(parameters);
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
 
@@ -69,10 +70,9 @@ public class HttpRequest {
             queue = Volley.newRequestQueue(listener.getContext().getApplicationContext());
             queue.add(jsonArrayRequest);
         }
-
     }
 
-    public void sendRequest(String tag){
+ /*   public void sendRequest(String tag){
         // Request a string response
         StringRequest stringRequest = new StringRequest(Request.Method.GET, URL,
                 new Response.Listener<String>() {
@@ -106,7 +106,7 @@ public class HttpRequest {
             queue.add(stringRequest);
         }
 
-    }
+    }*/
 
     public RequestQueue getQueue(){
         return this.queue;
