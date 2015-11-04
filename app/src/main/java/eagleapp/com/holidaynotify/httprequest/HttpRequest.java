@@ -15,8 +15,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 
+import eagleapp.com.holidaynotify.dao.Day;
 import eagleapp.com.holidaynotify.httprequest.enrico.Action;
+import eagleapp.com.holidaynotify.httprequest.enrico.JsonParser;
 
 /**
  * Created by Pete on 3.11.2015.
@@ -42,6 +45,8 @@ public class HttpRequest {
                         if(resultListener.get() == null){
                             Log.d(TAG, "listener null in receiving http response");
                         }else{
+                            List<Day> days = JsonParser.parseJson(response);
+                            Log.d(TAG, "days: " + days.toString());
                             resultListener.get().onResponse(response.toString());
                         }
                     }
