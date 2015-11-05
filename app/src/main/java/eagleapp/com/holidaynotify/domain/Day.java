@@ -1,4 +1,4 @@
-package eagleapp.com.holidaynotify.dao;
+package eagleapp.com.holidaynotify.domain;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -6,10 +6,11 @@ import java.util.Date;
 /**
  * Created by Pete on 4.11.2015.
  */
-public class Day {
+public class Day implements Comparable{
     private Date date;
     private String localName;
     private String englishName;
+    private String notes;
 
     public Day(Date date, String localName, String englishName){
         this.date = date;
@@ -35,6 +36,12 @@ public class Day {
     public String getEnglishName(){
         return this.englishName;
     }
+    public String getNotes() {
+        return notes;
+    }
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
 
     @Override
     public String toString(){
@@ -43,5 +50,16 @@ public class Day {
         String dateStr = df.format(date);
         ret = dateStr + ": " + englishName + " (" + localName + ")" ;
         return ret;
+    }
+
+    @Override
+    public int compareTo(Object another) {
+        Day day = (Day) another;
+        if( this.date.before(day.getDate()) ){
+            return -1;
+        }else if( this.date.after(day.getDate()) ){
+            return 1;
+        }
+        return 0;
     }
 }

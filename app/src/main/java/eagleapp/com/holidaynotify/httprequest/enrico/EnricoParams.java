@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -13,12 +14,12 @@ import java.util.Map;
  * Created by Pete on 4.11.2015.
  */
 public class EnricoParams {
-    public String testField = "hei";
     public static class Actions {
-        public static final String KEY = "action";
-        public static class Values {
-            public static final String MONTH_HOLIDAYS = "getPublicHolidaysForMonth";
-        }
+        public static final String MONTH_HOLIDAYS = "getPublicHolidaysForMonth";
+        public static final String YEAR_HOLIDAYS = "getPublicHolidaysForYear";
+        public static final String DATE_RANGE_HOLIDAYS = "getPublicHolidaysForDateRange";
+        public static final String IS_PUBLIC_HOLIDAY = "isPublicHoliday";
+        public static final String SUPPORTED_COUNTRIES_LIST = "getSupportedCountries";
     }
 
     public static class Keys {
@@ -27,23 +28,6 @@ public class EnricoParams {
         public static final String YEAR = "year";
         public static final String COUNTRY = "country";
         public static final String REGION = "region";
-    }
-
-    /**
-     * Builds a map from the parameter list
-     * @param params Must be in format key, value, key, value, etc.
-     * @return returns an ordered hashmap with the parameters
-     */
-    public static LinkedHashMap<String, String> buildParamsMap(String... params){
-        List<String> paramList = Arrays.asList(params);
-        LinkedHashMap<String, String> ret = new LinkedHashMap<>();
-        String actionValue = findValue(EnricoParams.Actions.KEY, paramList);
-        ret.put(EnricoParams.Actions.KEY, actionValue);
-        ret.put(EnricoParams.Keys.MONTH, findValue(EnricoParams.Keys.MONTH, paramList));
-        ret.put(EnricoParams.Keys.YEAR, findValue(EnricoParams.Keys.YEAR, paramList));
-        ret.put(EnricoParams.Keys.COUNTRY, findValue(EnricoParams.Keys.COUNTRY, paramList));
-        ret.put(EnricoParams.Keys.REGION, findValue(EnricoParams.Keys.REGION, paramList));
-        return ret;
     }
 
     public static String findValue(String key, List<String> params){
@@ -55,6 +39,14 @@ public class EnricoParams {
         return null;
     }
 
+    public static Map buildParamsMapForYear(int year, String countryCode, String region){
+        Map<String, String> params = new HashMap<>();
+        params.put(EnricoParams.Keys.ACTION, EnricoParams.Actions.MONTH_HOLIDAYS);
+        params.put(EnricoParams.Keys.YEAR, String.valueOf(year));
+        params.put(EnricoParams.Keys.COUNTRY, countryCode);
+        params.put(EnricoParams.Keys.REGION, region);
+        return params;
+    }
     public static String buildParamsString(Map<String, String> params){
         List<String> paramsList = new ArrayList<>();
         if(params != null){

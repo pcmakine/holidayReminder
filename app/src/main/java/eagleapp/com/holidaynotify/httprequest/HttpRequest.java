@@ -12,12 +12,9 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 
 import java.lang.ref.WeakReference;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.Map;
 
-import eagleapp.com.holidaynotify.dao.Day;
 import eagleapp.com.holidaynotify.httprequest.enrico.EnricoParams;
-import eagleapp.com.holidaynotify.httprequest.enrico.JsonParser;
 
 /**
  * Created by Pete on 3.11.2015.
@@ -28,10 +25,10 @@ public class HttpRequest {
     public static final String BASE_URL = "http://www.kayaposoft.com/enrico/json/v1.0/?";
     private WeakReference<HttpResultListener> resultListener;
     private RequestQueue queue;
-    private LinkedHashMap<String, String> parameters;
+    private Map<String, String> parameters;
 
 
-    public HttpRequest(HttpResultListener resultListener, LinkedHashMap<String, String> parameters){
+    public HttpRequest(HttpResultListener resultListener, Map<String, String> parameters){
         this.resultListener = new WeakReference(resultListener);
         this.parameters = parameters;
     }

@@ -2,7 +2,6 @@ package eagleapp.com.holidaynotify;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -16,18 +15,20 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 
-import eagleapp.com.holidaynotify.dao.Day;
+import eagleapp.com.holidaynotify.domain.Day;
 import eagleapp.com.holidaynotify.httprequest.HttpRequest;
 import eagleapp.com.holidaynotify.httprequest.HttpResultListener;
 import eagleapp.com.holidaynotify.httprequest.enrico.EnricoParams;
 import eagleapp.com.holidaynotify.httprequest.enrico.JsonParser;
+import eagleapp.com.holidaynotify.httprequest.enrico.actions.EnricoAction;
+import eagleapp.com.holidaynotify.httprequest.enrico.actions.YearHolidays;
 
 public class MainActivity extends AppCompatActivity implements HttpResultListener {
 
@@ -53,22 +54,16 @@ public class MainActivity extends AppCompatActivity implements HttpResultListene
                         .setAction("Action", null).show();
             }
         });
-
-        //responseTW = (TextView) findViewById(R.id.responseTW);
     }
 
     @Override
     protected void onResume(){
         super.onResume();
-        LinkedHashMap<String, String> params = EnricoParams.buildParamsMap(
-                EnricoParams.Actions.KEY,
-                EnricoParams.Actions.Values.MONTH_HOLIDAYS,
-                EnricoParams.Keys.MONTH, "5",
-                EnricoParams.Keys.YEAR, "2016",
-                EnricoParams.Keys.COUNTRY, "fin",
-                EnricoParams.Keys.REGION, "Helsinki"
-        );
-        this.request = new HttpRequest(this, params);
+        YearHolidays enricoAction = new YearHolidays();
+        enricoAction.setCountryCode("fin");
+        enricoAction.setRegion("Helsinki");
+        enricoAction.setYear(Calendar.getInstance().get(Calendar.YEAR));
+        this.request = new HttpRequest(this, enricoAction.buildParamsMap());
         this.request.sendJsonRequest(requestTag);
     }
 
@@ -105,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements HttpResultListene
     @Override
     public void onResponse(String response) {
         List<Day> days = JsonParser.parseJson(response);
+        Collections.sort(days);
         List<String> daysStr = new ArrayList<String>();
         for(Day day: days){
             daysStr.add(day.toString());

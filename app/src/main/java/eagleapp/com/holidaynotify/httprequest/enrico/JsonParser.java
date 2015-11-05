@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import eagleapp.com.holidaynotify.dao.Day;
+import eagleapp.com.holidaynotify.domain.Day;
 
 /**
  * Created by Pete on 4.11.2015.
