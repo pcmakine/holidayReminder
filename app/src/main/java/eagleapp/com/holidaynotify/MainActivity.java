@@ -2,6 +2,7 @@ package eagleapp.com.holidaynotify;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -10,14 +11,23 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
+import eagleapp.com.holidaynotify.dao.Day;
 import eagleapp.com.holidaynotify.httprequest.HttpRequest;
 import eagleapp.com.holidaynotify.httprequest.HttpResultListener;
 import eagleapp.com.holidaynotify.httprequest.enrico.EnricoParams;
+import eagleapp.com.holidaynotify.httprequest.enrico.JsonParser;
 
 public class MainActivity extends AppCompatActivity implements HttpResultListener {
 
@@ -25,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements HttpResultListene
     private TextView responseTW;
     private HttpRequest request;
     private final String requestTag = "dayRequests";
+    private String[] testData = new String[]{"test1", "test2", "test3"};
 
 
     @Override
@@ -43,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements HttpResultListene
             }
         });
 
-        responseTW = (TextView) findViewById(R.id.responseTW);
+        //responseTW = (TextView) findViewById(R.id.responseTW);
     }
 
     @Override
@@ -92,8 +103,16 @@ public class MainActivity extends AppCompatActivity implements HttpResultListene
     }
 
     @Override
-    public void onResponse(String result) {
-        responseTW.setText(result);
+    public void onResponse(String response) {
+        List<Day> days = JsonParser.parseJson(response);
+        List<String> daysStr = new ArrayList<String>();
+        for(Day day: days){
+            daysStr.add(day.toString());
+        }
+        ListView list = (ListView)findViewById(R.id.list);
+        ArrayAdapter<String> arrAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, daysStr);
+        list.setAdapter(arrAdapter);
+        //responseTW.setText(result);
     }
 
     @Override

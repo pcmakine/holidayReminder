@@ -46,8 +46,6 @@ public class HttpRequest {
                         if(resultListener.get() == null){
                             Log.d(TAG, "listener null in receiving http response");
                         }else{
-                            List<Day> days = JsonParser.parseJson(response);
-                            Log.d(TAG, "days: " + days.toString());
                             resultListener.get().onResponse(response.toString());
                         }
                     }

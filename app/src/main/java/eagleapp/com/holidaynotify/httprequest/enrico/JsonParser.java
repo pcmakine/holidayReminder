@@ -38,4 +38,15 @@ public class JsonParser {
         }
         return days;
     }
+    public static List<Day> parseJson(String json){
+        try {
+            JSONArray array = new JSONArray(json);
+            return parseJson(array);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
 }
