@@ -14,6 +14,7 @@ public class YearHolidays extends EnricoAction {
     private String region;
 
     public YearHolidays(){
+        super();
         this.actionStr = EnricoParams.Actions.YEAR_HOLIDAYS;
         this.requiredKeys.add( EnricoParams.Keys.YEAR );
     }

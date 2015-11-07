@@ -12,28 +12,25 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import eagleapp.com.holidaynotify.domain.Country;
 import eagleapp.com.holidaynotify.domain.Day;
 import eagleapp.com.holidaynotify.httprequest.HttpRequest;
 import eagleapp.com.holidaynotify.httprequest.HttpResultListener;
+import eagleapp.com.holidaynotify.httprequest.JsonParamsHandler;
 import eagleapp.com.holidaynotify.httprequest.enrico.EnricoParams;
 import eagleapp.com.holidaynotify.httprequest.enrico.JsonParser;
-import eagleapp.com.holidaynotify.httprequest.enrico.actions.EnricoAction;
+import eagleapp.com.holidaynotify.httprequest.enrico.actions.SupportedCountries;
 import eagleapp.com.holidaynotify.httprequest.enrico.actions.YearHolidays;
 
 public class MainActivity extends AppCompatActivity implements HttpResultListener {
 
     public static final String TAG = MainActivity.class.getName();
-    private TextView responseTW;
     private HttpRequest request;
     private final String requestTag = "dayRequests";
     private String[] testData = new String[]{"test1", "test2", "test3"};
@@ -64,6 +61,10 @@ public class MainActivity extends AppCompatActivity implements HttpResultListene
         enricoAction.setRegion("Helsinki");
         enricoAction.setYear(Calendar.getInstance().get(Calendar.YEAR));
         this.request = new HttpRequest(this, enricoAction.buildParamsMap());
+        this.request.sendJsonRequest(requestTag);
+
+        SupportedCountries countryListAction = new SupportedCountries();
+        this.request.setParams(countryListAction.buildParamsMap());
         this.request.sendJsonRequest(requestTag);
     }
 
@@ -97,8 +98,17 @@ public class MainActivity extends AppCompatActivity implements HttpResultListene
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onResponse(String response) {
+    private void updateCountryList(String response){
+        List<Country> countries = JsonParser.parseCountries(response);
+        if(countries != null){
+            Log.d(TAG, "countries: " + countries.toString());
+        }else{
+            Log.d(TAG, "update countrylist called, but no countries returned by the parser");
+        }
+
+    }
+
+    private void updateDateList(String response){
         List<Day> days = JsonParser.parseJson(response);
         Collections.sort(days);
         List<String> daysStr = new ArrayList<String>();
@@ -108,12 +118,20 @@ public class MainActivity extends AppCompatActivity implements HttpResultListene
         ListView list = (ListView)findViewById(R.id.list);
         ArrayAdapter<String> arrAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, daysStr);
         list.setAdapter(arrAdapter);
-        //responseTW.setText(result);
     }
 
     @Override
-    public void onErrorResult(String result) {
-        onResponse(result);
+    public void onResponse(String response, String url) {
+        if(JsonParamsHandler.findTokensByKey(request.BASE_URL, url, "&", EnricoParams.Keys.ACTION).contains(EnricoParams.Actions.SUPPORTED_COUNTRIES_LIST)){
+            updateCountryList(response);
+        }else{
+            updateDateList(response);   //TODO change this to update to the database
+        }
+    }
+
+    @Override
+    public void onErrorResult(String result, String url) {
+        onResponse(result, url);
     }
 
     @Override

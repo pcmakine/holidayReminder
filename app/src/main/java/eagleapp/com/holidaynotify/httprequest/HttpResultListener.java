@@ -7,7 +7,7 @@ import android.content.Context;
  */
 public interface HttpResultListener {
 
-    public void onResponse(String result);
-    public void onErrorResult(String result);
+    public void onResponse(String result, String url);
+    public void onErrorResult(String result, String url);
     public Context getContext();
 }
