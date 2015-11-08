@@ -1,6 +1,7 @@
-package eagleapp.com.holidaynotify;
+package eagleapp.com.holidaynotify.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -17,7 +18,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
+import eagleapp.com.holidaynotify.R;
 import eagleapp.com.holidaynotify.domain.Country;
 import eagleapp.com.holidaynotify.domain.Day;
 import eagleapp.com.holidaynotify.httprequest.HttpRequest;
@@ -29,11 +32,9 @@ import eagleapp.com.holidaynotify.httprequest.enrico.actions.SupportedCountries;
 import eagleapp.com.holidaynotify.httprequest.enrico.actions.YearHolidays;
 
 public class MainActivity extends AppCompatActivity implements HttpResultListener {
-
     public static final String TAG = MainActivity.class.getName();
     private HttpRequest request;
-    private final String requestTag = "dayRequests";
-    private String[] testData = new String[]{"test1", "test2", "test3"};
+    private final String requestTag = "httpRequest";
 
 
     @Override
@@ -63,13 +64,13 @@ public class MainActivity extends AppCompatActivity implements HttpResultListene
         this.request = new HttpRequest(this, enricoAction.buildParamsMap());
         this.request.sendJsonRequest(requestTag);
 
-        SupportedCountries countryListAction = new SupportedCountries();
+      /*  SupportedCountries countryListAction = new SupportedCountries();
         this.request.setParams(countryListAction.buildParamsMap());
-        this.request.sendJsonRequest(requestTag);
+        this.request.sendJsonRequest(requestTag);*/
     }
 
     protected void onStop(){
-        if( request.getQueue() != null ){
+        if( request != null && request.getQueue() != null ){
             Log.d(TAG, "onstop method");
             request.getQueue().cancelAll(requestTag);
         }
@@ -92,6 +93,8 @@ public class MainActivity extends AppCompatActivity implements HttpResultListene
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent i = new Intent(this, SettingsActivity.class);
+            startActivity(i);
             return true;
         }
 
@@ -105,7 +108,6 @@ public class MainActivity extends AppCompatActivity implements HttpResultListene
         }else{
             Log.d(TAG, "update countrylist called, but no countries returned by the parser");
         }
-
     }
 
     private void updateDateList(String response){
