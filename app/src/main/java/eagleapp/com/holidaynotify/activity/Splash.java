@@ -7,18 +7,16 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 import android.view.Window;
 import android.widget.Toast;
 
 import java.util.List;
 
 import eagleapp.com.holidaynotify.R;
+import eagleapp.com.holidaynotify.db.dao.CountryDao;
 import eagleapp.com.holidaynotify.domain.Country;
 import eagleapp.com.holidaynotify.httprequest.HttpRequest;
 import eagleapp.com.holidaynotify.httprequest.HttpResultListener;
@@ -91,8 +89,13 @@ public class Splash extends AppCompatActivity implements HttpResultListener{
     }
     private void updateCountryList(String response){
         List<Country> countries = JsonParser.parseCountries(response);
-        if(countries != null){
+        if(countries != null && !countries.isEmpty()){
             Log.d(TAG, "countries: " + countries.toString());
+
+            Log.d(TAG, "removing old rows from country table...");
+            CountryDao.getInstance().deleteAllRows(this);
+            Log.d(TAG, "saving countries to db...");
+            CountryDao.getInstance().insertOne(this, countries);      //todo maybe move this to asynctask
         }else{
             Log.d(TAG, "update countrylist called, but no countries returned by the parser");
         }

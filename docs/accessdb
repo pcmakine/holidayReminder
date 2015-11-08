@@ -1,0 +1,9 @@
+HOW TO VIEW SQLITE 3 DATABASE:
+
+adb shell
+run-as eagleapp.com.holidaynotify
+chmod 777 databases
+chmod 777 databases/holidayNotifyDb
+exit
+cp /data/data/eagleapp.com.holidaynotify/databases/holidayNotifyDb /sdcard
+adb pull /sdcard/database_name

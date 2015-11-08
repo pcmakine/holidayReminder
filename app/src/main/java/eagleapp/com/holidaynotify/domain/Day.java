@@ -17,7 +17,6 @@ public class Day implements Comparable{
         this.localName = localName;
         this.englishName = englishName;
     }
-
     public void setDate(Date date){
         this.date = date;
     }
@@ -48,7 +47,7 @@ public class Day implements Comparable{
         String ret = "";
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         String dateStr = df.format(date);
-        ret = dateStr + ": " + englishName + " (" + localName + ")" ;
+        ret = dateStr + ": " + localName + " (" + englishName + ")" ;
         return ret;
     }
 

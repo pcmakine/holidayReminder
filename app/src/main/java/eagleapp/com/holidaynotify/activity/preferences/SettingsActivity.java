@@ -1,4 +1,4 @@
-package eagleapp.com.holidaynotify.activity;
+package eagleapp.com.holidaynotify.activity.preferences;
 
 
 import android.annotation.TargetApi;
@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
@@ -21,6 +22,7 @@ import android.text.TextUtils;
 import android.view.MenuItem;
 
 import eagleapp.com.holidaynotify.R;
+import eagleapp.com.holidaynotify.activity.AppCompatPreferenceActivity;
 
 import java.util.List;
 
@@ -52,5 +54,16 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // Show the Up button in the action bar.
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                NavUtils.navigateUpFromSameTask(this);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

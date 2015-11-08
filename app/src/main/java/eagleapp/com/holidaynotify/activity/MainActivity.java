@@ -2,7 +2,9 @@ package eagleapp.com.holidaynotify.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -18,9 +20,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import eagleapp.com.holidaynotify.R;
+import eagleapp.com.holidaynotify.activity.preferences.SettingsActivity;
+import eagleapp.com.holidaynotify.db.dao.CountryDao;
 import eagleapp.com.holidaynotify.domain.Country;
 import eagleapp.com.holidaynotify.domain.Day;
 import eagleapp.com.holidaynotify.httprequest.HttpRequest;
@@ -28,7 +31,6 @@ import eagleapp.com.holidaynotify.httprequest.HttpResultListener;
 import eagleapp.com.holidaynotify.httprequest.JsonParamsHandler;
 import eagleapp.com.holidaynotify.httprequest.enrico.EnricoParams;
 import eagleapp.com.holidaynotify.httprequest.enrico.JsonParser;
-import eagleapp.com.holidaynotify.httprequest.enrico.actions.SupportedCountries;
 import eagleapp.com.holidaynotify.httprequest.enrico.actions.YearHolidays;
 
 public class MainActivity extends AppCompatActivity implements HttpResultListener {
@@ -57,9 +59,14 @@ public class MainActivity extends AppCompatActivity implements HttpResultListene
     @Override
     protected void onResume(){
         super.onResume();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String defaultCountryCode = CountryDao.getInstance().loadFirst(this).getCountryCode();
+        String countryCode = preferences.getString(getResources().getString(R.string.preference_country_selection_key), defaultCountryCode);
+        Log.d(TAG, "Selected country code: " + countryCode);
+
         YearHolidays enricoAction = new YearHolidays();
-        enricoAction.setCountryCode("fin");
-        enricoAction.setRegion("Helsinki");
+        enricoAction.setCountryCode(countryCode);
+        // enricoAction.setRegion("Helsinki");
         enricoAction.setYear(Calendar.getInstance().get(Calendar.YEAR));
         this.request = new HttpRequest(this, enricoAction.buildParamsMap());
         this.request.sendJsonRequest(requestTag);
@@ -71,7 +78,6 @@ public class MainActivity extends AppCompatActivity implements HttpResultListene
 
     protected void onStop(){
         if( request != null && request.getQueue() != null ){
-            Log.d(TAG, "onstop method");
             request.getQueue().cancelAll(requestTag);
         }
         super.onStop();

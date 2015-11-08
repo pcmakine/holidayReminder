@@ -22,11 +22,17 @@ public class YearHolidays extends EnricoAction {
     @Override
     public Map<String, String> buildParamsMap() {
         Map<String, String> params = new HashMap<>();
-        params.put(EnricoParams.Keys.ACTION, this.actionStr);
-        params.put(EnricoParams.Keys.YEAR, String.valueOf(year));
-        params.put(EnricoParams.Keys.COUNTRY, countryCode);
-        params.put(EnricoParams.Keys.REGION, region);
+        addToParams(params, EnricoParams.Keys.ACTION, this.actionStr);
+        addToParams(params, EnricoParams.Keys.YEAR, String.valueOf(year));
+        addToParams(params, EnricoParams.Keys.COUNTRY, countryCode);
+        addToParams(params, EnricoParams.Keys.REGION, region);
         return params;
+    }
+
+    private void addToParams(Map<String, String> params, String key, String value){
+        if(value != null){
+            params.put(key, value);
+        }
     }
 
     public String getRegion() {
