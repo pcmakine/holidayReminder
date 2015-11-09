@@ -4,18 +4,15 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import eagleapp.com.holidaynotify.db.DbHandler;
 import eagleapp.com.holidaynotify.db.table.CountryTable;
 import eagleapp.com.holidaynotify.domain.Country;
+import eagleapp.com.holidaynotify.utils.DateUtils;
 
 /**
  * Created by Pete on 8.11.2015.
@@ -42,8 +39,8 @@ public class CountryDao {
         ContentValues vals = new ContentValues();
         vals.put(CountryTable.FULL_NAME, country.getFullName());
         vals.put(CountryTable.COUNTRY_CODE, country.getCountryCode());
-        vals.put(CountryTable.FROM_DATE, dateToString(country.getFrom()));
-        vals.put(CountryTable.TO_DATE, dateToString(country.getTo()));
+        vals.put(CountryTable.FROM_DATE, DateUtils.dateToString(country.getFrom()));
+        vals.put(CountryTable.TO_DATE, DateUtils.dateToString(country.getTo()));
         db.insert(CountryTable.TABLE_NAME, null, vals);
         db.close();
         return errors;
@@ -88,10 +85,11 @@ public class CountryDao {
     }
 
     private Country cursorToCountry(Cursor c){
+        Long id = c.getLong(c.getColumnIndex(CountryTable._ID));
         String fullName = c.getString(c.getColumnIndex(CountryTable.FULL_NAME));
         String countryCode = c.getString(c.getColumnIndex(CountryTable.COUNTRY_CODE));
-        Date fromDate = stringToDate(c.getString(c.getColumnIndex(CountryTable.FROM_DATE)));
-        Date toDate = stringToDate(c.getString(c.getColumnIndex(CountryTable.TO_DATE)));
+        Date fromDate = DateUtils.stringToDate(c.getString(c.getColumnIndex(CountryTable.FROM_DATE)));
+        Date toDate = DateUtils.stringToDate(c.getString(c.getColumnIndex(CountryTable.TO_DATE)));
         return new Country(fullName, countryCode, fromDate, toDate, null);
     }
 
@@ -101,23 +99,4 @@ public class CountryDao {
         db.close();
     }
 
-    public String dateToString(Date date){
-        if(date == null){
-            return null;
-        }
-        SimpleDateFormat df = new SimpleDateFormat(CountryTable.DATE_PATTERN, Locale.ENGLISH);
-        return df.format(date);
-    }
-
-    public Date stringToDate(String dateStr){
-        SimpleDateFormat df = new SimpleDateFormat(CountryTable.DATE_PATTERN, Locale.ENGLISH);
-        Date date = null;
-        try {
-            date = df.parse(dateStr);
-        } catch (ParseException e) {
-            Log.e(TAG, "error in stringToDate method, cannot parse date");
-            e.printStackTrace();
-        }
-        return date;
-    }
 }

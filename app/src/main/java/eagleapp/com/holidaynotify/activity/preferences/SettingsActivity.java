@@ -4,6 +4,7 @@ package eagleapp.com.holidaynotify.activity.preferences;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -19,6 +20,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
 
 import eagleapp.com.holidaynotify.R;
@@ -38,6 +40,8 @@ import java.util.List;
  * API Guide</a> for more information on developing a Settings UI.
  */
 public class SettingsActivity extends AppCompatPreferenceActivity {
+    public static final String TAG = SettingsActivity.class.getName();
+    private SharedPreferences.OnSharedPreferenceChangeListener listener;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +58,33 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // Show the Up button in the action bar.
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+                if( key.equals(getResources().getString(R.string.preference_country_selection_key)) ){
+                    Preference pref = findPreference(getResources().getString(R.string.preference_country_selection_key));
+                    String value = prefs.getString(key, "");
+                    System.out.println("listener called!!!!!!!");
+                    Log.d(TAG, "preference changed, new value: " + value);
+
+                    //TODO download the country's holidays and save them in db if not in db yet
+
+                }
+            }
+        };
+        getPreferenceScreen().getSharedPreferences()
+                .registerOnSharedPreferenceChangeListener(listener);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        getPreferenceScreen().getSharedPreferences()
+                .unregisterOnSharedPreferenceChangeListener(listener);
     }
 
     @Override

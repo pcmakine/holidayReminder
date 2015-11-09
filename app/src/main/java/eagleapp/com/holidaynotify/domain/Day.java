@@ -7,15 +7,22 @@ import java.util.Date;
  * Created by Pete on 4.11.2015.
  */
 public class Day implements Comparable{
+    private Long id;
     private Date date;
     private String localName;
     private String englishName;
     private String notes;
 
-    public Day(Date date, String localName, String englishName){
+    public Day(Date date, String localName, String englishName, String notes){
+        this(null, date, localName, englishName, notes);
+    }
+
+    public Day(Long id, Date date, String localName, String englishName, String notes){
+        this.id = id;
         this.date = date;
         this.localName = localName;
         this.englishName = englishName;
+        this.notes = notes;
     }
     public void setDate(Date date){
         this.date = date;
@@ -40,6 +47,12 @@ public class Day implements Comparable{
     }
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+    public long getId() {
+        return id;
+    }
+    public void setId(long id) {
+        this.id = id;
     }
 
     @Override

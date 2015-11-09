@@ -7,7 +7,6 @@ import android.provider.BaseColumns;
  */
 public abstract class CountryTable implements BaseColumns {
     public static final String TABLE_NAME = "countries";
-    public static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     //columns
     public static final String FULL_NAME = "fullName";

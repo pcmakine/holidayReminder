@@ -6,12 +6,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import eagleapp.com.holidaynotify.db.table.CountryTable;
+import eagleapp.com.holidaynotify.db.table.DayTable;
 
 /**
  * Created by Pete on 8.11.2015.
  */
 public class DbHandler extends SQLiteOpenHelper {
     private static DbHandler mInstance = null;
+    public static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
     // Database Version
     private static final int DATABASE_VERSION = 1;
     // Database Name
@@ -32,6 +34,7 @@ public class DbHandler extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CountryTable.ON_CREATE);
+        db.execSQL(DayTable.ON_CREATE);
     }
 
     @Override

@@ -1,19 +1,28 @@
 package eagleapp.com.holidaynotify.domain;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Pete on 7.11.2015.
  */
 public class Country {
+    private Long id;
     private String fullName;
     private String countryCode;
     private Date from;
     private Date to;
-    private List<String> regions;
+    private Set<String> regions;
 
-    public Country(String fullName, String countryCode, Date from, Date to, List<String> regions) {
+    public Country(String fullName, String countryCode, Date from, Date to, Set<String> regions) {
+        this(null, fullName, countryCode, from, to, regions);
+    }
+
+    public Country(Long id, String fullName, String countryCode, Date from, Date to, Set<String> regions){
+        this.id = id;
         this.fullName = fullName;
         this.countryCode = countryCode;
         this.from = from;
@@ -53,12 +62,20 @@ public class Country {
         this.to = to;
     }
 
-    public List<String> getRegions() {
+    public Set<String> getRegions() {
         return regions;
     }
 
-    public void setRegions(List<String> regions) {
+    public void setRegions(Set<String> regions) {
         this.regions = regions;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     @Override

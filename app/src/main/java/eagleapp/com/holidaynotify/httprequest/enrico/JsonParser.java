@@ -6,8 +6,11 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import eagleapp.com.holidaynotify.domain.Country;
 import eagleapp.com.holidaynotify.domain.Day;
@@ -25,7 +28,7 @@ public class JsonParser {
                     Date date = jsonDateToDate(jsonObject.getJSONObject("date"));
                     String localName = jsonObject.getString("localName");
                     String englishName = jsonObject.getString("englishName");
-                    days.add(new Day(date, localName, englishName));
+                    days.add(new Day(date, localName, englishName, null));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -46,7 +49,7 @@ public class JsonParser {
                     Date toDate = jsonDateToDate(jsonObject.getJSONObject("toDate"));
 
                     JSONArray regionArr = jsonObject.getJSONArray("regions");
-                    List<String> regions = new ArrayList<>();
+                    Set<String> regions = new HashSet<>();
                     if( regionArr != null ){
                         for (int j = 0; j < regionArr.length(); j++){
                             regions.add( regionArr.get(j).toString() );
