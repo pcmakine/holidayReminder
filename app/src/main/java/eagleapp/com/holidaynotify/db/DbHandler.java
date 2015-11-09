@@ -15,7 +15,7 @@ public class DbHandler extends SQLiteOpenHelper {
     private static DbHandler mInstance = null;
     public static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
     // Database Version
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     // Database Name
     private static final String DATABASE_NAME = "holidayNotifyDb";
 
@@ -41,6 +41,7 @@ public class DbHandler extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop older table if existed
         db.execSQL("DROP TABLE IF EXISTS " + CountryTable.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + DayTable.TABLE_NAME);
         // Create tables again
         onCreate(db);
     }

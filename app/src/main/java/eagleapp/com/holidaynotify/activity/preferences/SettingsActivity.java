@@ -25,7 +25,15 @@ import android.view.MenuItem;
 
 import eagleapp.com.holidaynotify.R;
 import eagleapp.com.holidaynotify.activity.AppCompatPreferenceActivity;
+import eagleapp.com.holidaynotify.db.dao.DayDao;
+import eagleapp.com.holidaynotify.domain.Day;
+import eagleapp.com.holidaynotify.httprequest.HttpRequest;
+import eagleapp.com.holidaynotify.httprequest.HttpResultListener;
+import eagleapp.com.holidaynotify.httprequest.enrico.JsonParser;
+import eagleapp.com.holidaynotify.httprequest.enrico.actions.YearHolidays;
 
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -39,9 +47,11 @@ import java.util.List;
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
-public class SettingsActivity extends AppCompatPreferenceActivity {
+public class SettingsActivity extends AppCompatPreferenceActivity implements HttpResultListener {
     public static final String TAG = SettingsActivity.class.getName();
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
+    private HttpRequest request;
+    private final String requestTag = "httpRequest";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +70,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
     }
 
+    private void downloadHolidayDaysForYear(String countryCode, int year){
+        YearHolidays enricoAction = new YearHolidays();
+        enricoAction.setCountryCode(countryCode);
+        enricoAction.setYear(Calendar.getInstance().get(Calendar.YEAR));
+        this.request = new HttpRequest(this, enricoAction.buildParamsMap());
+        this.request.sendJsonRequest(requestTag);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -67,12 +85,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
                 if( key.equals(getResources().getString(R.string.preference_country_selection_key)) ){
                     Preference pref = findPreference(getResources().getString(R.string.preference_country_selection_key));
-                    String value = prefs.getString(key, "");
+                    String countryCode = prefs.getString(key, "");
                     System.out.println("listener called!!!!!!!");
-                    Log.d(TAG, "preference changed, new value: " + value);
-
-                    //TODO download the country's holidays and save them in db if not in db yet
-
+                    Log.d(TAG, "preference changed, new value: " + countryCode);
+                    List<Day> days = DayDao.getInstance().loadByCountry(SettingsActivity.this, countryCode);
+                    System.out.println("days in db: " + days.toString());
+                    if(days == null || days.isEmpty()){
+                        downloadHolidayDaysForYear(countryCode, Calendar.getInstance().get(Calendar.YEAR));
+                    }
                 }
             }
         };
@@ -88,6 +108,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     }
 
     @Override
+    protected void onStop(){
+        if( request != null && request.getQueue() != null ){
+            request.getQueue().cancelAll(requestTag);
+        }
+        super.onStop();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
@@ -96,5 +124,22 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onResponse(String result, String url) {
+        List<Day> days = JsonParser.parseJson(result, url);
+        Collections.sort(days);
+        DayDao.getInstance().insertMany(this, days);
+    }
+
+    @Override
+    public void onErrorResult(String result, String url) {
+
+    }
+
+    @Override
+    public Context getContext() {
+        return null;
     }
 }

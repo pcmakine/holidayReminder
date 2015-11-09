@@ -95,7 +95,7 @@ public class Splash extends AppCompatActivity implements HttpResultListener{
             Log.d(TAG, "removing old rows from country table...");
             CountryDao.getInstance().deleteAllRows(this);
             Log.d(TAG, "saving countries to db...");
-            CountryDao.getInstance().insertOne(this, countries);      //todo maybe move this to asynctask
+            CountryDao.getInstance().insertMany(this, countries);      //todo maybe move this to asynctask
         }else{
             Log.d(TAG, "update countrylist called, but no countries returned by the parser");
         }

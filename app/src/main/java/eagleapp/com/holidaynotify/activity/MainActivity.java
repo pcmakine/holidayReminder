@@ -66,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements HttpResultListene
 
         YearHolidays enricoAction = new YearHolidays();
         enricoAction.setCountryCode(countryCode);
-        // enricoAction.setRegion("Helsinki");
         enricoAction.setYear(Calendar.getInstance().get(Calendar.YEAR));
         this.request = new HttpRequest(this, enricoAction.buildParamsMap());
         this.request.sendJsonRequest(requestTag);
@@ -116,8 +115,8 @@ public class MainActivity extends AppCompatActivity implements HttpResultListene
         }
     }
 
-    private void updateDateList(String response){
-        List<Day> days = JsonParser.parseJson(response);
+    private void updateDateList(String response, String url){
+        List<Day> days = JsonParser.parseJson(response, url);
         Collections.sort(days);
         List<String> daysStr = new ArrayList<String>();
         for(Day day: days){
@@ -133,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements HttpResultListene
         if(JsonParamsHandler.findTokensByKey(request.BASE_URL, url, "&", EnricoParams.Keys.ACTION).contains(EnricoParams.Actions.SUPPORTED_COUNTRIES_LIST)){
             updateCountryList(response);
         }else{
-            updateDateList(response);   //TODO change this to update to the database
+            updateDateList(response, url);   //TODO change this to update to the database
         }
     }
 

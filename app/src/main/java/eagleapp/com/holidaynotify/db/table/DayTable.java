@@ -13,7 +13,7 @@ public class DayTable implements BaseColumns{
     public static final String LOCAL_NAME = "localName";
     public static final String ENGLISH_NAME = "englishName";
     public static final String NOTES = "notes";
-    public static final String COUNTRY_ID = "countryId";
+    public static final String COUNTRY_CODE = "countryCode";
 
     public static final String ON_CREATE =
             "CREATE TABLE " + TABLE_NAME +
@@ -22,7 +22,8 @@ public class DayTable implements BaseColumns{
                     LOCAL_NAME + " TEXT," +
                     ENGLISH_NAME + " TEXT," +
                     NOTES + " TEXT," +
-                    COUNTRY_ID + " INTEGER NOT NULL," +
-                    "FOREIGN KEY(" + COUNTRY_ID + ") REFERENCES " +
-                    CountryTable.TABLE_NAME + "(" + CountryTable._ID + "))";
+                    COUNTRY_CODE + " INTEGER NOT NULL," +
+                    "FOREIGN KEY(" + COUNTRY_CODE + ") REFERENCES " +
+                    CountryTable.TABLE_NAME + "(" + CountryTable.COUNTRY_CODE + ")," +
+                    " UNIQUE(" + DATE + ", " + LOCAL_NAME + ", " + COUNTRY_CODE + ") ON CONFLICT REPLACE)";
 }

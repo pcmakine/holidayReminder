@@ -14,12 +14,14 @@ import java.util.Set;
 
 import eagleapp.com.holidaynotify.domain.Country;
 import eagleapp.com.holidaynotify.domain.Day;
+import eagleapp.com.holidaynotify.httprequest.HttpRequest;
+import eagleapp.com.holidaynotify.httprequest.JsonParamsHandler;
 
 /**
  * Created by Pete on 4.11.2015.
  */
 public class JsonParser {
-    public static List<Day> parseJson(JSONArray jsonArray){
+    public static List<Day> parseJson(JSONArray jsonArray, String url){
         List<Day> days = new ArrayList<>();
         if( jsonArray != null && jsonArray.length() > 0){
             for(int i = 0; i < jsonArray.length(); i++){
@@ -28,7 +30,8 @@ public class JsonParser {
                     Date date = jsonDateToDate(jsonObject.getJSONObject("date"));
                     String localName = jsonObject.getString("localName");
                     String englishName = jsonObject.getString("englishName");
-                    days.add(new Day(date, localName, englishName, null));
+                    String countryCode = JsonParamsHandler.findTokensByKey(HttpRequest.BASE_URL, url, "&", EnricoParams.Keys.COUNTRY).get(0);
+                    days.add(new Day(null, date, localName, englishName, null, countryCode));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -84,12 +87,12 @@ public class JsonParser {
         }
         return parseCountries(arr);
     }
-    public static List<Day> parseJson(String json){
+    public static List<Day> parseJson(String json, String url){
         JSONArray arr = jsonStringToJsonArray(json);
         if( arr == null){
             return null;
         }
-        return parseJson(arr);
+        return parseJson(arr, url);
     }
 
     private static JSONArray jsonStringToJsonArray(String json){

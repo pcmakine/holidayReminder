@@ -33,7 +33,7 @@ public class CountryDao {
         return instance;
     }
 
-    public String insertMany(Context context, Country country){
+    public String insertOne(Context context, Country country){
         String errors = "";
         SQLiteDatabase db = DbHandler.getInstance(context).getWritableDatabase();
         ContentValues vals = new ContentValues();
@@ -46,10 +46,10 @@ public class CountryDao {
         return errors;
     }
 
-    public String insertOne(Context context, List<Country> countries){
+    public String insertMany(Context context, List<Country> countries){
         String errors = "";
         for(Country country: countries){
-            insertMany(context, country);
+            insertOne(context, country);
         }
         return errors;
     }

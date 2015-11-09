@@ -15,6 +15,7 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Map;
 
+import eagleapp.com.holidaynotify.activity.HolidayNotify;
 import eagleapp.com.holidaynotify.httprequest.enrico.EnricoParams;
 
 /**
@@ -62,7 +63,7 @@ public class HttpRequest {
             Log.d(TAG, "listener null in receiving http response");
         }else{
             // Add the request to the queue
-            queue = Volley.newRequestQueue(listener.getContext().getApplicationContext());
+            queue = Volley.newRequestQueue(HolidayNotify.context);
             queue.add(jsonArrayRequest);
         }
     }
