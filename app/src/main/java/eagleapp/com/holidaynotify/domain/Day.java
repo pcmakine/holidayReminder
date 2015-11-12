@@ -12,19 +12,19 @@ public class Day implements Comparable{
     private String localName;
     private String englishName;
     private String notes;
-    private String countryCode;
+    private Region region;
 
     public Day(Date date, String localName, String englishName, String notes){
         this(null, date, localName, englishName, notes, null);
     }
 
-    public Day(Long id, Date date, String localName, String englishName, String notes, String countryCode){
+    public Day(Long id, Date date, String localName, String englishName, String notes, Region region){
         this.id = id;
         this.date = date;
         this.localName = localName;
         this.englishName = englishName;
         this.notes = notes;
-        this.countryCode = countryCode;
+        this.region = region;
     }
     public void setDate(Date date){
         this.date = date;
@@ -56,12 +56,11 @@ public class Day implements Comparable{
     public void setId(long id) {
         this.id = id;
     }
-    public String getCountryCode() {
-        return countryCode;
+    public Region getRegion() {
+        return region;
     }
-
-    public void setCountryCode(String countryCode) {
-        this.countryCode = countryCode;
+    public void setRegion(Region region) {
+        this.region = region;
     }
 
     public void setId(Long id) {

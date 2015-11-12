@@ -20,5 +20,6 @@ public abstract class CountryTable implements BaseColumns {
             FULL_NAME + " TEXT," +
             COUNTRY_CODE + " TEXT NOT NULL UNIQUE," +
             TO_DATE + " TEXT," +
-            FROM_DATE + " TEXT)";
+            FROM_DATE + " TEXT)," +
+            " UNIQUE " + COUNTRY_CODE + " ON CONFLICT REPLACE";
 }

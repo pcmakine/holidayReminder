@@ -12,6 +12,7 @@ import java.util.List;
 import eagleapp.com.holidaynotify.db.DbHandler;
 import eagleapp.com.holidaynotify.db.table.CountryTable;
 import eagleapp.com.holidaynotify.domain.Country;
+import eagleapp.com.holidaynotify.domain.Region;
 import eagleapp.com.holidaynotify.utils.DateUtils;
 
 /**
@@ -42,6 +43,7 @@ public class CountryDao {
         vals.put(CountryTable.FROM_DATE, DateUtils.dateToString(country.getFrom()));
         vals.put(CountryTable.TO_DATE, DateUtils.dateToString(country.getTo()));
         db.insert(CountryTable.TABLE_NAME, null, vals);
+        RegionDao.getInstance().insertMany(context, country.getRegions());
         db.close();
         return errors;
     }

@@ -12,8 +12,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import eagleapp.com.holidaynotify.db.dao.RegionDao;
 import eagleapp.com.holidaynotify.domain.Country;
 import eagleapp.com.holidaynotify.domain.Day;
+import eagleapp.com.holidaynotify.domain.Region;
 import eagleapp.com.holidaynotify.httprequest.HttpRequest;
 import eagleapp.com.holidaynotify.httprequest.JsonParamsHandler;
 
@@ -22,6 +24,15 @@ import eagleapp.com.holidaynotify.httprequest.JsonParamsHandler;
  */
 public class JsonParser {
     public static List<Day> parseJson(JSONArray jsonArray, String url){
+        List<String> foundValues = JsonParamsHandler.findTokensByKey(HttpRequest.BASE_URL, url, "&", EnricoParams.Keys.REGION);
+        String regionName = null;
+        if(foundValues == null || foundValues.isEmpty()){
+            regionName = Region.DUMMY_REGION_NAME;
+        }else{
+            regionName = foundValues.get(0);
+        }
+        String countryCode = JsonParamsHandler.findTokensByKey(HttpRequest.BASE_URL, url, "&", EnricoParams.Keys.COUNTRY).get(0);
+        Region region = RegionDao.getInstance().loadByNameAndCountryCode(regionName , countryCode);
         List<Day> days = new ArrayList<>();
         if( jsonArray != null && jsonArray.length() > 0){
             for(int i = 0; i < jsonArray.length(); i++){
@@ -30,8 +41,7 @@ public class JsonParser {
                     Date date = jsonDateToDate(jsonObject.getJSONObject("date"));
                     String localName = jsonObject.getString("localName");
                     String englishName = jsonObject.getString("englishName");
-                    String countryCode = JsonParamsHandler.findTokensByKey(HttpRequest.BASE_URL, url, "&", EnricoParams.Keys.COUNTRY).get(0);
-                    days.add(new Day(null, date, localName, englishName, null, countryCode));
+                    days.add(new Day(null, date, localName, englishName, null, region));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -52,10 +62,10 @@ public class JsonParser {
                     Date toDate = jsonDateToDate(jsonObject.getJSONObject("toDate"));
 
                     JSONArray regionArr = jsonObject.getJSONArray("regions");
-                    Set<String> regions = new HashSet<>();
+                    Set<Region> regions = new HashSet<>();
                     if( regionArr != null ){
                         for (int j = 0; j < regionArr.length(); j++){
-                            regions.add( regionArr.get(j).toString() );
+                            regions.add( new Region(null, regionArr.get(j).toString(), countryCode )  );
                         }
                     }
                     Country country = new Country(fullName, countryCode, fromDate, toDate, regions);

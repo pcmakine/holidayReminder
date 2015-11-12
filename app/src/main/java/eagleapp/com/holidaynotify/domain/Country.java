@@ -15,19 +15,38 @@ public class Country {
     private String countryCode;
     private Date from;
     private Date to;
-    private Set<String> regions;
+    private Set<Region> regions;
 
-    public Country(String fullName, String countryCode, Date from, Date to, Set<String> regions) {
+    public Country(String fullName, String countryCode, Date from, Date to, Set<Region> regions) {
         this(null, fullName, countryCode, from, to, regions);
     }
 
-    public Country(Long id, String fullName, String countryCode, Date from, Date to, Set<String> regions){
+    public Country(Long id, String fullName, String countryCode, Date from, Date to, Set<Region> regions){
         this.id = id;
         this.fullName = fullName;
         this.countryCode = countryCode;
         this.from = from;
         this.to = to;
+
+        if( regions == null || regions.isEmpty() ){
+            regions = new HashSet<>();
+            regions.add(new Region(null, Region.DUMMY_REGION_NAME, countryCode));
+        } else if ( !regions.isEmpty() ){
+            addDummyRegionIfMissing(regions);
+        }
         this.regions = regions;
+    }
+
+    private void addDummyRegionIfMissing(Collection<Region> regions){
+        boolean found = false;
+        for(Region region: regions){
+            if(region.getName().equals(Region.DUMMY_REGION_NAME)){
+                found = true;
+            }
+        }
+        if(!found){
+            regions.add(new Region(null, Region.DUMMY_REGION_NAME, countryCode));
+        }
     }
 
     public String getFullName() {
@@ -62,11 +81,11 @@ public class Country {
         this.to = to;
     }
 
-    public Set<String> getRegions() {
+    public Set<Region> getRegions() {
         return regions;
     }
 
-    public void setRegions(Set<String> regions) {
+    public void setRegions(Set<Region> regions) {
         this.regions = regions;
     }
 

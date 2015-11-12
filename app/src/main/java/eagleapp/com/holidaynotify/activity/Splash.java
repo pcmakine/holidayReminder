@@ -5,14 +5,18 @@ import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Window;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import java.util.Arrays;
 import java.util.List;
 
 import eagleapp.com.holidaynotify.R;
@@ -31,12 +35,18 @@ public class Splash extends AppCompatActivity implements HttpResultListener{
     private static long startTime;
     private final String requestTag = "httpRequest";
     private HttpRequest request;
+    private AsyncTask countryTask;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        ProgressBar progressBar = (ProgressBar) findViewById(R.id.loadIndicator);
+        progressBar.getIndeterminateDrawable().setColorFilter(
+                ContextCompat.getColor(this, R.color.white),
+                android.graphics.PorterDuff.Mode.SRC_IN);
     }
 
     private void startMainActivity(){
@@ -81,21 +91,29 @@ public class Splash extends AppCompatActivity implements HttpResultListener{
             startMainActivity();
         }
     }
+
+    @Override
+    protected void onPause(){
+        if(countryTask != null) {
+            countryTask.cancel(true);
+            countryTask = null;
+        }
+        super.onPause();
+    }
     @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
         Window window = getWindow();
         window.setFormat(PixelFormat.RGBA_8888);
     }
-    private void updateCountryList(String response){
+    private void updateCountryList(String response) {
         List<Country> countries = JsonParser.parseCountries(response);
         if(countries != null && !countries.isEmpty()){
             Log.d(TAG, "countries: " + countries.toString());
-
-            Log.d(TAG, "removing old rows from country table...");
-            CountryDao.getInstance().deleteAllRows(this);
             Log.d(TAG, "saving countries to db...");
-            CountryDao.getInstance().insertMany(this, countries);      //todo maybe move this to asynctask
+            //CountryDao.getInstance().insertMany(this, countries);      //todo maybe move this to asynctask
+            countryTask = new InsertCountriesTask();
+            countryTask.execute(countries.toArray(new Country[countries.size()]));
         }else{
             Log.d(TAG, "update countrylist called, but no countries returned by the parser");
         }
@@ -105,10 +123,10 @@ public class Splash extends AppCompatActivity implements HttpResultListener{
         if( result != null){
             updateCountryList(result);
         }
-        long timeLeft = SPLASH_MIN_TIME - (System.currentTimeMillis() - startTime);
+  /*      long timeLeft = SPLASH_MIN_TIME - (System.currentTimeMillis() - startTime);
         Log.d(TAG, "Fetching the countrylist took " + (System.currentTimeMillis() - startTime)+
                 " ms. Time left: " + timeLeft + " ms");
-        startMainActivityAfterMinTimePassed();
+        startMainActivityAfterMinTimePassed();*/
     }
 
     @Override
@@ -126,5 +144,19 @@ public class Splash extends AppCompatActivity implements HttpResultListener{
     @Override
     public Context getContext() {
         return this;
+    }
+
+    private class InsertCountriesTask extends AsyncTask<Country, Void, String> {
+
+        @Override
+        protected String doInBackground(Country... params) {
+            CountryDao.getInstance().insertMany(HolidayNotify.context, Arrays.asList(params));
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result){
+            startMainActivityAfterMinTimePassed();
+        }
     }
 }
