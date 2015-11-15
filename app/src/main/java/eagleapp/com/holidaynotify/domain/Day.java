@@ -1,5 +1,8 @@
 package eagleapp.com.holidaynotify.domain;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -13,18 +16,20 @@ public class Day implements Comparable{
     private String englishName;
     private String notes;
     private Region region;
+    private boolean notificationActive;
 
     public Day(Date date, String localName, String englishName, String notes){
-        this(null, date, localName, englishName, notes, null);
+        this(null, date, localName, englishName, notes, null, true);
     }
 
-    public Day(Long id, Date date, String localName, String englishName, String notes, Region region){
+    public Day(Long id, Date date, String localName, String englishName, String notes, Region region, boolean notificationActive){
         this.id = id;
         this.date = date;
         this.localName = localName;
         this.englishName = englishName;
         this.notes = notes;
         this.region = region;
+        this.notificationActive = notificationActive;
     }
     public void setDate(Date date){
         this.date = date;
@@ -62,9 +67,38 @@ public class Day implements Comparable{
     public void setRegion(Region region) {
         this.region = region;
     }
-
     public void setId(Long id) {
         this.id = id;
+    }
+    public boolean isNotificationActive() {
+        return notificationActive;
+    }
+    public void setNotificationActive(boolean notificationActive) {
+        this.notificationActive = notificationActive;
+    }
+
+    @Override
+    public int hashCode(){
+        return new HashCodeBuilder(17, 31).     //two randomly chosen prime numbers TODO can we just always use 17 and 31, or should we have some randomization check somewhere?
+                append(date).
+                append(englishName).
+                toHashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj){
+        if(!(obj instanceof  Day)){
+            return false;
+        }
+        if(obj == this){
+            return true;
+        }
+
+        Day day = (Day) obj;
+        return new EqualsBuilder().
+                append(date, day.date).
+                append(englishName, day.englishName).
+                isEquals();
     }
 
     @Override

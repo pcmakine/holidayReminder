@@ -30,6 +30,12 @@ public abstract class EnricoAction {
     }
     public abstract Map<String, String> buildParamsMap();
 
+    protected void addToParams(Map<String, String> params, String key, String value){
+        if(value != null){
+            params.put(key, value);
+        }
+    }
+
     public String getCountryCode() {
         return countryCode;
     }

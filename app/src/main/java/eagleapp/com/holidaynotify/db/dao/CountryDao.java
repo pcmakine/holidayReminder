@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import eagleapp.com.holidaynotify.activity.HolidayNotify;
 import eagleapp.com.holidaynotify.db.DbHandler;
 import eagleapp.com.holidaynotify.db.table.CountryTable;
 import eagleapp.com.holidaynotify.domain.Country;
-import eagleapp.com.holidaynotify.domain.Region;
 import eagleapp.com.holidaynotify.utils.DateUtils;
 
 /**
@@ -40,8 +40,8 @@ public class CountryDao {
         ContentValues vals = new ContentValues();
         vals.put(CountryTable.FULL_NAME, country.getFullName());
         vals.put(CountryTable.COUNTRY_CODE, country.getCountryCode());
-        vals.put(CountryTable.FROM_DATE, DateUtils.dateToString(country.getFrom()));
-        vals.put(CountryTable.TO_DATE, DateUtils.dateToString(country.getTo()));
+        vals.put(CountryTable.FROM_DATE, DateUtils.dateToDbString(country.getFrom()));
+        vals.put(CountryTable.TO_DATE, DateUtils.dateToDbString(country.getTo()));
         db.insert(CountryTable.TABLE_NAME, null, vals);
         RegionDao.getInstance().insertMany(context, country.getRegions());
         db.close();
@@ -71,6 +71,15 @@ public class CountryDao {
         }
         db.close();
         return countries;
+    }
+
+    public List<String> loadAllCodes(){
+        List<Country> countries = loadAll(HolidayNotify.context);
+        List<String> codes = new ArrayList<>();
+        for(Country country: countries){
+            codes.add(country.getCountryCode());
+        }
+        return codes;
     }
 
     public Country loadFirst(Context context){

@@ -41,7 +41,7 @@ public class JsonParser {
                     Date date = jsonDateToDate(jsonObject.getJSONObject("date"));
                     String localName = jsonObject.getString("localName");
                     String englishName = jsonObject.getString("englishName");
-                    days.add(new Day(null, date, localName, englishName, null, region));
+                    days.add(new Day(null, date, localName, englishName, null, region, true));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

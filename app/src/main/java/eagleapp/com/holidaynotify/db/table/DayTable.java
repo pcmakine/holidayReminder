@@ -14,6 +14,7 @@ public class DayTable implements BaseColumns{
     public static final String ENGLISH_NAME = "englishName";
     public static final String NOTES = "notes";
     public static final String REGION_ID = "regionId";
+    public static final String NOTIFICATION_ACTIVE = "notification_active";     //1 = true, 0 = false
 
     public static final String ON_CREATE =
             "CREATE TABLE " + TABLE_NAME +
@@ -23,6 +24,7 @@ public class DayTable implements BaseColumns{
                     ENGLISH_NAME + " TEXT," +
                     NOTES + " TEXT," +
                     REGION_ID + " INTEGER NOT NULL," +
+                    NOTIFICATION_ACTIVE + " INTEGER NOT NULL DEFAULT 1," +
                     "FOREIGN KEY(" + REGION_ID + ") REFERENCES " +
                     RegionTable.TABLE_NAME + "(" + RegionTable._ID + ")," +
                     " UNIQUE(" + DATE + ", " + LOCAL_NAME + ", " + REGION_ID + ") ON CONFLICT REPLACE)";

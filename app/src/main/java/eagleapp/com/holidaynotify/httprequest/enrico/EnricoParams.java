@@ -14,6 +14,7 @@ import java.util.Map;
  * Created by Pete on 4.11.2015.
  */
 public class EnricoParams {
+    public static final String DATE_PATTERN = "dd-MM-yyyy";
     public static class Actions {
         public static final String MONTH_HOLIDAYS = "getPublicHolidaysForMonth";
         public static final String YEAR_HOLIDAYS = "getPublicHolidaysForYear";
@@ -28,6 +29,8 @@ public class EnricoParams {
         public static final String YEAR = "year";
         public static final String COUNTRY = "country";
         public static final String REGION = "region";
+        public static final String FROM_DATE = "fromDate";
+        public static final String TO_DATE = "toDate";
     }
 
     public static String findValue(String key, List<String> params){

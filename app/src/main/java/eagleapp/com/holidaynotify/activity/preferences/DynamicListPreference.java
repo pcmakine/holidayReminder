@@ -2,6 +2,7 @@ package eagleapp.com.holidaynotify.activity.preferences;
 
 import android.content.Context;
 import android.preference.ListPreference;
+import android.preference.MultiSelectListPreference;
 import android.util.AttributeSet;
 import android.util.Log;
 
@@ -40,7 +41,7 @@ public class DynamicListPreference extends ListPreference {
         }
         setEntries(entries.toArray(new CharSequence[entries.size()]));
         setEntryValues(entryValues.toArray(new CharSequence[entryValues.size()]));
-        setValueIndex(1);
+        //setValueIndex(1);
     }
 
     public DynamicListPreference(Context context) {

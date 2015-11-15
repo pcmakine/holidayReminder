@@ -14,11 +14,20 @@ import eagleapp.com.holidaynotify.db.DbHandler;
  */
 public class DateUtils {
     public static final String TAG = DateUtils.class.getName();
-    public static String dateToString(Date date){
+    public static String dateToDbString(Date date){
+        return dateToString(DbHandler.DATE_PATTERN, null, date);
+    }
+
+    public static String dateToString(String pattern, Locale locale, Date date){
         if(date == null){
             return null;
         }
-        SimpleDateFormat df = new SimpleDateFormat(DbHandler.DATE_PATTERN, Locale.ENGLISH);
+        SimpleDateFormat df;
+        if(locale != null){
+            df = new SimpleDateFormat(pattern, Locale.ENGLISH);
+        }else{
+            df = new SimpleDateFormat(pattern);
+        }
         return df.format(date);
     }
 

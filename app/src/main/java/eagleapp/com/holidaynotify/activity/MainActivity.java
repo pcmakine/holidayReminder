@@ -2,9 +2,7 @@ package eagleapp.com.holidaynotify.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -15,28 +13,33 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Spinner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import eagleapp.com.holidaynotify.R;
 import eagleapp.com.holidaynotify.activity.preferences.SettingsActivity;
 import eagleapp.com.holidaynotify.db.dao.CountryDao;
 import eagleapp.com.holidaynotify.domain.Country;
 import eagleapp.com.holidaynotify.domain.Day;
-import eagleapp.com.holidaynotify.httprequest.HttpRequest;
 import eagleapp.com.holidaynotify.httprequest.HttpResultListener;
 import eagleapp.com.holidaynotify.httprequest.JsonParamsHandler;
 import eagleapp.com.holidaynotify.httprequest.enrico.EnricoParams;
+import eagleapp.com.holidaynotify.httprequest.enrico.EnricoService;
 import eagleapp.com.holidaynotify.httprequest.enrico.JsonParser;
-import eagleapp.com.holidaynotify.httprequest.enrico.actions.YearHolidays;
 
 public class MainActivity extends AppCompatActivity implements HttpResultListener {
     public static final String TAG = MainActivity.class.getName();
-    private HttpRequest request;
-    private final String requestTag = "httpRequest";
+    private EnricoService enricoService;
+    private DayListAdapter<Day> arrAdapter;
+    private SortedSet<Day> holidays;
 
 
     @Override
@@ -54,30 +57,30 @@ public class MainActivity extends AppCompatActivity implements HttpResultListene
                         .setAction("Action", null).show();
             }
         });
+        List<String> countryCodes = CountryDao.getInstance().loadAllCodes();
+        Spinner countrySelection = (Spinner) findViewById(R.id.countryFilter);
+        countrySelection.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, countryCodes.toArray(new String[countryCodes.size()])));
     }
 
     @Override
     protected void onResume(){
         super.onResume();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String defaultCountryCode = CountryDao.getInstance().loadFirst(this).getCountryCode();
-        String countryCode = preferences.getString(getResources().getString(R.string.preference_country_selection_key), defaultCountryCode);
-        Log.d(TAG, "Selected country code: " + countryCode);
+        this.enricoService = new EnricoService(this);
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.YEAR, -1);
+        Date fromDate = cal.getTime();
+        cal.add(Calendar.YEAR, 4);
+        Date toDate = cal.getTime();
 
-        YearHolidays enricoAction = new YearHolidays();
-        enricoAction.setCountryCode(countryCode);
-        enricoAction.setYear(Calendar.getInstance().get(Calendar.YEAR));
-        this.request = new HttpRequest(this, enricoAction.buildParamsMap());
-        this.request.sendJsonRequest(requestTag);
-
-      /*  SupportedCountries countryListAction = new SupportedCountries();
-        this.request.setParams(countryListAction.buildParamsMap());
-        this.request.sendJsonRequest(requestTag);*/
+        enricoService.getHolidaysForDateRange(fromDate, toDate);
     }
 
     protected void onStop(){
-        if( request != null && request.getQueue() != null ){
+       /* if( request != null && request.getQueue() != null ){
             request.getQueue().cancelAll(requestTag);
+        }*/
+        if(enricoService != null){
+            enricoService.stopRequests();
         }
         super.onStop();
     }
@@ -118,18 +121,31 @@ public class MainActivity extends AppCompatActivity implements HttpResultListene
     private void updateDateList(String response, String url){
         List<Day> days = JsonParser.parseJson(response, url);
         Collections.sort(days);
-        List<String> daysStr = new ArrayList<String>();
-        for(Day day: days){
-            daysStr.add(day.toString());
+
+        if(holidays == null){
+            holidays = new TreeSet<Day>();
         }
+        for(Day day: days){
+            if(day.getDate() == new Date() || day.getDate().after(new Date())){
+                if(!holidays.contains(day)){
+                    holidays.add(day);
+                }
+            }
+        }
+        List<Day> displayDays = new ArrayList<>();
+        displayDays.addAll(holidays);
         ListView list = (ListView)findViewById(R.id.list);
-        ArrayAdapter<String> arrAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, daysStr);
+        if(arrAdapter == null ){
+            arrAdapter = new DayListAdapter<Day>(holidays, this);
+        }else{
+            arrAdapter.addAll(displayDays);
+        }
         list.setAdapter(arrAdapter);
     }
 
     @Override
     public void onResponse(String response, String url) {
-        if(JsonParamsHandler.findTokensByKey(request.BASE_URL, url, "&", EnricoParams.Keys.ACTION).contains(EnricoParams.Actions.SUPPORTED_COUNTRIES_LIST)){
+        if(JsonParamsHandler.findTokensByKey(EnricoService.BASE_URL, url, "&", EnricoParams.Keys.ACTION).contains(EnricoParams.Actions.SUPPORTED_COUNTRIES_LIST)){
             updateCountryList(response);
         }else{
             updateDateList(response, url);   //TODO change this to update to the database

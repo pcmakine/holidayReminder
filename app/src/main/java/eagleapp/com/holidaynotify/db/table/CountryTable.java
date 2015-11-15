@@ -18,8 +18,7 @@ public abstract class CountryTable implements BaseColumns {
             "CREATE TABLE " + TABLE_NAME +
             " ( " + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
             FULL_NAME + " TEXT," +
-            COUNTRY_CODE + " TEXT NOT NULL UNIQUE," +
+            COUNTRY_CODE + " TEXT NOT NULL UNIQUE ON CONFLICT REPLACE," +
             TO_DATE + " TEXT," +
-            FROM_DATE + " TEXT)," +
-            " UNIQUE " + COUNTRY_CODE + " ON CONFLICT REPLACE";
+            FROM_DATE + " TEXT)";
 }

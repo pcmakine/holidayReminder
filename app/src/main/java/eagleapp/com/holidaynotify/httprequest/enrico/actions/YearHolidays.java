@@ -29,12 +29,6 @@ public class YearHolidays extends EnricoAction {
         return params;
     }
 
-    private void addToParams(Map<String, String> params, String key, String value){
-        if(value != null){
-            params.put(key, value);
-        }
-    }
-
     public String getRegion() {
         return region;
     }
