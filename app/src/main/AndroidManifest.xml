@@ -4,14 +4,15 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
+        android:name=".activity.HolidayNotify"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:name="eagleapp.com.holidaynotify.activity.HolidayNotify">
+        android:theme="@style/AppTheme" >
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/upcoming_holidays"
@@ -36,6 +37,17 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="eagleapp.com.holidaynotify.activity.MainActivity" />
         </activity>
+
+        <receiver
+            android:name=".notification.AlarmReceiver"
+            android:enabled="true"
+            android:exported="true" >
+        </receiver>
+
+        <service
+            android:name=".notification.NotificationService"
+            android:exported="false" >
+        </service>
     </application>
 
 </manifest>

@@ -18,7 +18,7 @@ import eagleapp.com.holidaynotify.utils.DateUtils;
 /**
  * Created by Pete on 8.11.2015.
  */
-public class CountryDao {
+public class CountryDao extends Dao<Country> {
     public static final String TAG = CountryDao.class.getName();
     private static CountryDao instance = new CountryDao();
     private static final String QUERY_SELECT_ALL = "SELECT * FROM " + CountryTable.TABLE_NAME +
@@ -28,6 +28,7 @@ public class CountryDao {
             " ORDER BY " + CountryTable.FULL_NAME + " ASC LIMIT 1";
 
     private CountryDao(){
+        this.tableName = CountryTable.TABLE_NAME;
     }
 
     public static CountryDao getInstance(){
@@ -63,7 +64,7 @@ public class CountryDao {
         if(c != null){
             c.moveToFirst();
             while(!c.isAfterLast()){
-                Country country = cursorToCountry(c);
+                Country country = cursorToDomainObject(c);
                 countries.add(country);
                 c.moveToNext();
             }
@@ -88,20 +89,11 @@ public class CountryDao {
         Cursor c = db.rawQuery(QUERY_FIRST_ROW, null);
         if(c != null) {
             c.moveToFirst();
-            country = cursorToCountry(c);
+            country = cursorToDomainObject(c);
             c.close();
         }
         db.close();
         return country;
-    }
-
-    private Country cursorToCountry(Cursor c){
-        Long id = c.getLong(c.getColumnIndex(CountryTable._ID));
-        String fullName = c.getString(c.getColumnIndex(CountryTable.FULL_NAME));
-        String countryCode = c.getString(c.getColumnIndex(CountryTable.COUNTRY_CODE));
-        Date fromDate = DateUtils.stringToDate(c.getString(c.getColumnIndex(CountryTable.FROM_DATE)));
-        Date toDate = DateUtils.stringToDate(c.getString(c.getColumnIndex(CountryTable.TO_DATE)));
-        return new Country(fullName, countryCode, fromDate, toDate, null);
     }
 
     public void deleteAllRows(Context context){
@@ -110,4 +102,13 @@ public class CountryDao {
         db.close();
     }
 
+    @Override
+    protected Country cursorToDomainObject(Cursor c) {
+        Long id = c.getLong(c.getColumnIndex(CountryTable._ID));
+        String fullName = c.getString(c.getColumnIndex(CountryTable.FULL_NAME));
+        String countryCode = c.getString(c.getColumnIndex(CountryTable.COUNTRY_CODE));
+        Date fromDate = DateUtils.stringToDate(c.getString(c.getColumnIndex(CountryTable.FROM_DATE)));
+        Date toDate = DateUtils.stringToDate(c.getString(c.getColumnIndex(CountryTable.TO_DATE)));
+        return new Country(fullName, countryCode, fromDate, toDate, null);
+    }
 }

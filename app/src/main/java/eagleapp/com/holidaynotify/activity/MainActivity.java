@@ -11,12 +11,9 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Spinner;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -26,7 +23,7 @@ import java.util.TreeSet;
 
 import eagleapp.com.holidaynotify.R;
 import eagleapp.com.holidaynotify.activity.preferences.SettingsActivity;
-import eagleapp.com.holidaynotify.db.dao.CountryDao;
+import eagleapp.com.holidaynotify.db.dao.DayDao;
 import eagleapp.com.holidaynotify.domain.Country;
 import eagleapp.com.holidaynotify.domain.Day;
 import eagleapp.com.holidaynotify.httprequest.HttpResultListener;
@@ -34,6 +31,7 @@ import eagleapp.com.holidaynotify.httprequest.JsonParamsHandler;
 import eagleapp.com.holidaynotify.httprequest.enrico.EnricoParams;
 import eagleapp.com.holidaynotify.httprequest.enrico.EnricoService;
 import eagleapp.com.holidaynotify.httprequest.enrico.JsonParser;
+import eagleapp.com.holidaynotify.notification.AlarmScheduler;
 
 public class MainActivity extends AppCompatActivity implements HttpResultListener {
     public static final String TAG = MainActivity.class.getName();
@@ -57,9 +55,17 @@ public class MainActivity extends AppCompatActivity implements HttpResultListene
                         .setAction("Action", null).show();
             }
         });
-        List<String> countryCodes = CountryDao.getInstance().loadAllCodes();
-        Spinner countrySelection = (Spinner) findViewById(R.id.countryFilter);
-        countrySelection.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, countryCodes.toArray(new String[countryCodes.size()])));
+    }
+
+    public void setAlarm(View view){
+        Day day = DayDao.getInstance().loadFirst(this);
+        List<Day> days = new ArrayList<>();
+        days.add(day);
+        AlarmScheduler.scheduleNotificationForAllActiveHolidays(days);
+    }
+
+    public void cancelAlarm(View view){
+        AlarmScheduler.cancelNotification(null);
     }
 
     @Override
@@ -71,14 +77,10 @@ public class MainActivity extends AppCompatActivity implements HttpResultListene
         Date fromDate = cal.getTime();
         cal.add(Calendar.YEAR, 4);
         Date toDate = cal.getTime();
-
         enricoService.getHolidaysForDateRange(fromDate, toDate);
     }
 
     protected void onStop(){
-       /* if( request != null && request.getQueue() != null ){
-            request.getQueue().cancelAll(requestTag);
-        }*/
         if(enricoService != null){
             enricoService.stopRequests();
         }

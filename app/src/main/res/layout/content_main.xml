@@ -9,17 +9,30 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_main" tools:context=".MainActivity">
 
-    <Spinner
-        android:id="@+id/countryFilter"
+    <Button
+        android:id="@+id/alarmBtn"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-    </Spinner>
+        android:layout_height="wrap_content"
+        android:onClick="setAlarm"
+        android:text="set alarm"
+        android:visibility="gone"/>
+
+    <Button
+        android:id="@+id/cancelBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/alarmBtn"
+        android:onClick="cancelAlarm"
+        android:text="cancel alarm"
+        android:visibility="gone"/>
 
     <ListView
         android:id="@+id/list"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:layout_below="@id/countryFilter">
+        android:layout_below="@id/alarmBtn"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="10dp">
     </ListView>
 
 </RelativeLayout>

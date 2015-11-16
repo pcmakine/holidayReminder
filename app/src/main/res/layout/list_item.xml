@@ -2,6 +2,6 @@
     android:id="@+id/day_name"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    style="@style/TextAppearance.AppCompat.Medium"
+    style="@style/TextAppearance.AppCompat.Small"
     android:textColor="@android:color/black"
     xmlns:android="http://schemas.android.com/apk/res/android" />

@@ -40,8 +40,11 @@ public class DayDao extends Dao<Day>{
             " WHERE " + CountryTable.TABLE_NAME + "." + CountryTable.COUNTRY_CODE  + " = ?" +
             " AND " + DayTable.TABLE_NAME + "."  + DayTable.NOTIFICATION_ACTIVE + " =?"
             ;
+    private static final String QUERY_FIRST_ROW = "SELECT * FROM " + DayTable.TABLE_NAME +
+            " ORDER BY " + DayTable.DATE + " ASC LIMIT 1";
 
     private DayDao(){
+        this.tableName = DayTable.TABLE_NAME;
     }
 
     public static synchronized DayDao getInstance(){
@@ -75,6 +78,23 @@ public class DayDao extends Dao<Day>{
             insertOne(context, day);
         }
         return errors;
+    }
+
+    public Day loadFirst(Context context){
+        Day day = null;
+        SQLiteDatabase db = DbHandler.getInstance(context).getReadableDatabase();
+        Cursor c = db.rawQuery(QUERY_FIRST_ROW, null);
+        if(c != null) {
+            c.moveToFirst();
+            day = cursorToDomainObject(c);
+            c.close();
+        }
+        db.close();
+        return day;
+    }
+
+    public Day loadById(Long id){
+        return executeQuery(null, DayTable._ID + "=?", new String[]{String.valueOf(id)}, null, null, null, null);
     }
 
     public List<Day> loadByCountry(Context context, String countryCode){

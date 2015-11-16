@@ -1,27 +1,18 @@
 package eagleapp.com.holidaynotify.httprequest.enrico;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import eagleapp.com.holidaynotify.R;
 import eagleapp.com.holidaynotify.activity.HolidayNotify;
-import eagleapp.com.holidaynotify.db.dao.CountryDao;
 import eagleapp.com.holidaynotify.httprequest.HttpRequest;
 import eagleapp.com.holidaynotify.httprequest.HttpResultListener;
 import eagleapp.com.holidaynotify.httprequest.enrico.actions.HolidaysForDateRange;
-import eagleapp.com.holidaynotify.httprequest.enrico.actions.YearHolidays;
 
 /**
  * Created by Pete on 13.11.2015.
@@ -39,8 +30,8 @@ public class EnricoService implements HttpResultListener{
 
     public void getHolidaysForDateRange(Date fromDate, Date toDate){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(HolidayNotify.context);
-        String defaultCountryCode = CountryDao.getInstance().loadFirst(HolidayNotify.context).getCountryCode();
-        String countryCode = preferences.getString(HolidayNotify.context.getResources().getString(R.string.preference_country_selection_key), defaultCountryCode);
+       // String defaultCountryCode = CountryDao.getInstance().loadFirst(HolidayNotify.context).getCountryCode();
+        String countryCode = preferences.getString(HolidayNotify.context.getResources().getString(R.string.preference_country_selection_key), HolidayNotify.context.getResources().getString(R.string.countryCodeDefault));
         Log.d(TAG, "Selected country code: " + countryCode.toString());
         HolidaysForDateRange enricoAction = new HolidaysForDateRange();
         enricoAction.setCountryCode(countryCode);

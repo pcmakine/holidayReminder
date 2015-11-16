@@ -38,7 +38,7 @@ public abstract class Dao<T> {
     protected T executeQuery(String[] columns, String selection, String[] selectionArgs, String groupBy, String having, String orderBy, String limit){
         T ret = null;
         SQLiteDatabase db = DbHandler.getInstance(HolidayNotify.context).getReadableDatabase();
-        Cursor c = db.query(RegionTable.TABLE_NAME,        //table name
+        Cursor c = db.query(tableName,        //table name
                 null,                       //return all columns
                 selection,                //where clause
                 selectionArgs,                  //the arguments for where

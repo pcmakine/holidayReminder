@@ -33,6 +33,7 @@ import eagleapp.com.holidaynotify.httprequest.HttpRequest;
 import eagleapp.com.holidaynotify.httprequest.HttpResultListener;
 import eagleapp.com.holidaynotify.httprequest.enrico.JsonParser;
 import eagleapp.com.holidaynotify.httprequest.enrico.actions.YearHolidays;
+import eagleapp.com.holidaynotify.notification.AlarmScheduler;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -86,22 +87,34 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Htt
     @Override
     protected void onResume() {
         super.onResume();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(HolidayNotify.context);
+        String countryCode = preferences.getString(HolidayNotify.context.getResources().getString(R.string.preference_country_selection_key), HolidayNotify.context.getResources().getString(R.string.countryCodeDefault));
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(getResources().getString(R.string.preference_country_selection_previous_key), countryCode);
+
+        Log.d(TAG, "Selected country code: " + countryCode.toString());
+
+        //todo what happens if the app is closed before these operations finish?
         listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
                 if( key.equals(getResources().getString(R.string.preference_country_selection_key)) ){
                     Preference pref = findPreference(getResources().getString(R.string.preference_country_selection_key));
                     String defaultCountryCode = CountryDao.getInstance().loadFirst(HolidayNotify.context).getCountryCode();
                     String countryCode = prefs.getString(key, defaultCountryCode);
+                    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(HolidayNotify.context);
+                    //todo the default country code should maybe be something else?
+                    String previousCountryCode = preferences.getString(HolidayNotify.context.getResources().getString(R.string.preference_country_selection_previous_key), HolidayNotify.context.getResources().getString(R.string.countryCodeDefault));
+                    List<Day> previousHolidays = DayDao.getInstance().loadByCountry(SettingsActivity.this, previousCountryCode);
+                    AlarmScheduler.cancelAllNotificationsFor(previousHolidays);
 
-                    //String countryCode = prefs.getString(key, "");
-                    System.out.println("listener called!!!!!!!");
                     Log.d(TAG, "preference changed, new value: " + countryCode);
                     List<Day> days = new ArrayList<>();
                     days = DayDao.getInstance().loadByCountry(HolidayNotify.context, countryCode);
                     if(days == null || days.isEmpty()){
                         downloadHolidayDaysForYear(countryCode, Calendar.getInstance().get(Calendar.YEAR));
+                    }else{
+                        AlarmScheduler.scheduleNotificationForAllActiveHolidays(days);
                     }
-
                 }
             }
         };
@@ -140,6 +153,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Htt
         List<Day> days = JsonParser.parseJson(result, url);
         Collections.sort(days);
         DayDao.getInstance().insertMany(this, days);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(HolidayNotify.context);
+        String countryCode = preferences.getString(HolidayNotify.context.getResources().getString(R.string.preference_country_selection_key), HolidayNotify.context.getResources().getString(R.string.countryCodeDefault));
+        days = DayDao.getInstance().loadByCountry(this, countryCode);
+        AlarmScheduler.scheduleNotificationForAllActiveHolidays(days);
     }
 
     @Override

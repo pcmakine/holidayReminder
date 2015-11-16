@@ -3,6 +3,7 @@ package eagleapp.com.holidaynotify.domain;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -104,9 +105,9 @@ public class Day implements Comparable{
     @Override
     public String toString(){
         String ret = "";
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-        String dateStr = df.format(date);
-        ret = dateStr + ": " + localName + " (" + englishName + ")" ;
+       // SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        String dateStr = DateFormat.getDateInstance().format(date);
+        ret = localName + " (" + englishName + ")\n" +dateStr ;
         return ret;
     }
 

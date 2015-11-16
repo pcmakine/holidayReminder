@@ -66,4 +66,6 @@
     <string name="preference_country_selection_sumary">Select your country</string>
     <string name="preference_country_selection_title">Country</string>
     <string name="upcoming_holidays">Upcoming holidays</string>
+    <string name="countryCodeDefault">fin</string>
+    <string name="preference_country_selection_previous_key">previousCountryCode</string>
 </resources>
